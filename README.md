@@ -34,6 +34,12 @@
 apt update && apt install curl sudo git -y && curl -Of https://raw.githubusercontent.com/DigneZzZ/dwg-cli/main/setup.sh && chmod +x setup.sh && ./setup.sh
 ```
 
+Чтобы получить параметры по созданным конфигам:
+
+```bash
+chmod +x peer.sh && ./peer.sh
+```
+
 ## Что установится:
 
 0. Сначала установится Git, чтобы можно было скопировать мой репозиторий
