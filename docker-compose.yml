@@ -34,7 +34,7 @@ services:
     ports:
       - "51820:51820/udp"
     dns:
-      - 10.2.0.100 # Points to pihole
+      - 10.2.0.100 # Points to adguard
       - 10.2.0.200 # Points to unbound
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
