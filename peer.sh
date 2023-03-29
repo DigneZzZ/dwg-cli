@@ -38,7 +38,7 @@ if [ -f $peer_conf_path ]; then
 qrencode -t ansiutf8 < "$peer_conf_path"
 else
     # Выводим сообщение об ошибке, если файл конфигурации пира не найден
-    printf "\e[48;5;1Файл конфигурации %s не найден\e[0m\n" "$peer_conf_path"
+    printf "\e[48;5;1mФайл конфигурации %s не найден\e[0m\n" "$peer_conf_path"
 fi
 
 
