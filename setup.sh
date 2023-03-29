@@ -14,7 +14,7 @@ printf "\e[42mКлонирование репозитория dwg-cli...\e[0m\n"
 git clone https://github.com/dignezzz/dwg-cli.git temp
 
 if [ ! -d "dwg-cli" ]; then
-  mkdir ad-wireguard
+  mkdir dwg-cli
   echo "Папка dwg-cli создана."
 else
   echo "Папка dwg-cli уже существует."
