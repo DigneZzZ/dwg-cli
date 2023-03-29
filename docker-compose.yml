@@ -1,18 +1,20 @@
 version: "3"
 services:
   unbound:
-    image: "mvance/unbound:1.17.0"
+    image: "mvance/unbound:latest"
     container_name: unbound
     restart: unless-stopped
     hostname: "unbound"
     volumes:
       - "./unbound:/opt/unbound/etc/unbound/"
+    environment:
+      - UNBOUND_IP=10.2.0.200
     networks:
       private_network:
-        ipv4_address: 10.2.0.200
+        ipv4_address: ${UNBOUND_IP}
 
   wireguard:
-    depends_on: [unbound, pihole]
+    depends_on: [unbound, adguard]
     image: linuxserver/wireguard:latest
     container_name: wireguard
     cap_add:
@@ -21,21 +23,19 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=America/Los_Angeles # Change to your timezone
+      - TZ=America/Los_Angeles # Измените на свой часовой пояс
       - SERVERPORT=51820
-      #- SERVERURL=my.ddns.net #optional - For use with DDNS (Uncomment to use)
-      - PEERS=1 # How many peers to generate for you (clients)
-      - PEERDNS=10.2.0.100 # Set it to point to AdGuard
+      #- SERVERURL=my.ddns.net #необязательно - для использования с DDNS (раскомментируйте, чтобы использовать)
+      - PEERS=1 # Сколько клиентов сгенерировать для вас (клиенты)
       - INTERNAL_SUBNET=10.10.10.0
-      
     volumes:
       - ./wireguard:/config
       - /lib/modules:/lib/modules
     ports:
       - "51820:51820/udp"
     dns:
-      - 10.2.0.100 # Points to pihole
-      - 10.2.0.200 # Points to unbound
+      - ${AGH_IP} # Указывает на pihole
+      - ${UNBOUND_IP} # Указывает на unbound
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     healthcheck:
@@ -43,25 +43,33 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-      
+    environment:
+      - WIREGUARD_IP=10.2.0.3
     restart: unless-stopped
     networks:
       private_network:
-        ipv4_address: 10.2.0.3
+        ipv4_address: ${WIREGUARD_IP}
 
   adguardhome:
-    depends_on: [unbound]
-    image: adguard/adguardhome
+    depends_on: [adguard]
+    image: adguard/adguardhome:latest
     container_name: adguardhome
     restart: unless-stopped
     environment:
       - TZ=America/Los_Angeles
+      - PIHOLE_IP=10.2.0.100
     volumes:
       - ./work:/opt/adguardhome/work
       - ./conf:/opt/adguardhome/conf
     networks:
       private_network:
-        ipv4_address: 10.2.0.100
+        ipv4_address: ${AGH_IP}
+    secrets:
+      - adguard_password
+
+secrets:
+  adguard_password:
+    external: true
 
 networks:
   private_network:
