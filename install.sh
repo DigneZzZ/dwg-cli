@@ -47,31 +47,6 @@ else
   echo -e "${GREEN}Docker успешно установлен${NC}"
 fi
 
-# Устанавливаем Docker Compose
-#LATEST_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep "tag_name" | cut -d '"' -f 4)
-#if [ -x "$(command -v docker-compose)" ]; then
-#  INSTALLED_VERSION=$(docker-compose version --short)
-#  if [ "$LATEST_VERSION" == "$INSTALLED_VERSION" ]; then
-#    echo -e "${GREEN}Установлена последняя версия Docker Compose${NC}"
-#  else
-#    echo -e "${YELLOW}Обнаружена устаревшая версия Docker Compose${NC}"
-#    read -p "Хотите обновить Docker Compose? (y/n) " update_docker_compose
-#    case $update_docker_compose in
-#      [Yy]* ) 
-#        rm /usr/local/bin/docker-compose &&  curl -L "https://github.com/docker/compose/releases/download/$LATEST_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose &&  chmod +x /usr/local/bin/docker-compose && echo -e "${GREEN}Docker Compose успешно обновлен${NC}"
-#        ;;
-#      [Nn]* ) 
-#        echo -e "${YELLOW}Продолжаем выполнение скрипта без обновления Docker Compose${NC}"
-#        ;;
-#      * ) 
-#        echo -e "${RED}Неправильный ввод. Продолжаем выполнение скрипта без обновления Docker Compose${NC}"
-#        ;;
-#    esac
-#  fi
-#else
-#  curl -L "https://github.com/docker/compose/releases/download/$LATEST_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose &&  chmod +x /usr/local/bin/docker-compose && echo -e "${GREEN}Docker Compose успешно установлен${NC}"
-#fi
-
 # Проверка наличия docker-compose
 if command -v docker-compose &> /dev/null
 then
@@ -132,16 +107,16 @@ fi
 printf "${BLUE} Сейчас проверим свободен ли порт 51821 и не установлен ли другой wireguard.\n${NC}"
 
 if [[ $(docker ps -q --filter "name=wireguard") ]]; then
-    printf "!!!!>>> Другой Wireguard контейнер уже запущен, и вероятно занимает порт 51821. Пожалуйста удалите его и запустите скрипт заново\n "
+    printf "!!!!>>> Другой Wireguard контейнер уже запущен, и вероятно занимает порт 51820. Пожалуйста удалите его и запустите скрипт заново\n "
     printf "${RED} !!!!>>> Завершаю скрипт! \n${NC}"
     exit 1
 else
     printf "Wireguard контейнер не запущен в докер. Можно продолжать\n"
     # Проверка, запущен ли контейнер, использующий порт 51821
-    if lsof -Pi :51821 -sTCP:LISTEN -t >/dev/null ; then
-        printf "${RED}!!!!>>> Порт 51821 уже используется контейнером.!\n ${NC}"
-        if docker ps --format '{{.Names}} {{.Ports}}' | grep -q "wg-easy.*:51821->" ; then
-            printf "WG-EASY контейнер использует порт 51821. Хотите продолжить установку? (y/n): "
+    if lsof -Pi :51820 -sTCP:LISTEN -t >/dev/null ; then
+        printf "${RED}!!!!>>> Порт 51820 уже используется контейнером.!\n ${NC}"
+        if docker ps --format '{{.Names}} {{.Ports}}' | grep -q "цшкупгфкв.*:51820->" ; then
+            printf "WireGuard контейнер использует порт 51820. Хотите продолжить установку? (y/n): "
             read -r choice
             case "$choice" in 
               y|Y ) printf "Продолжаем установку...\n" ;;
@@ -153,7 +128,7 @@ else
             exit 1
         fi
     else
-        printf "Порт 51821 свободен.\n"
+        printf "Порт 51820 свободен.\n"
         printf "Хотите продолжить установку? (y/n): "
         read -r choice
         case "$choice" in 
@@ -166,57 +141,61 @@ fi
 
 printf "${GREEN} Этап проверки докера закончен, можно продолжить установку\n${NC}"
 
-# Получаем внешний IP-адрес
-MYHOST_IP=$(hostname -I | cut -d' ' -f1)
 
-# Записываем IP-адрес в файл docker-compose.yml с меткой MYHOSTIP
-sed -i -E  "s/- WG_HOST=.*/- WG_HOST=$MYHOST_IP/g" docker-compose.yml
 
-# Запросите у пользователя пароль
-echo ""
-echo ""
-#while true; do
-#  read -p "Введите пароль для веб-интерфейса: " WEBPASSWORD
-#  echo ""
+##### ЗДЕСЬ БУДЕТ КОД ДЛЯ КОРРЕКТИРОВКИ COMPOSE
 
-# if [[ "$WEBPASSWORD" =~ ^[[:alnum:]]+$ ]]; then
-#    # Записываем в файл новый пароль в кодировке UTF-8
-#    sed -i -E "s/- PASSWORD=.*/- PASSWORD=$WEBPASSWORD/g" docker-compose.yml
-#    break
-#  else
-#    echo "Пароль должен состоять только из английских букв и цифр, без пробелов и специальных символов."
-#  fi
-#done
 
-read -p "Введите пароль для веб-интерфейса: " WEBPASSWORD || WEBPASSWORD="openode"
-echo ""
 
-if [[ "$WEBPASSWORD" =~ ^[[:alnum:]]+$ ]]; then
-  # Записываем в файл новый пароль в кодировке UTF-8
-  sed -i -E "s/- PASSWORD=.*/- PASSWORD=$WEBPASSWORD/g" docker-compose.yml
+echo "Выберите способ настройки PEERS:"
+echo "1. Установить количество пиров"
+echo "2. Задать имена пиров через запятую"
+read -p "Введите номер способа: " choice
+
+if [ $choice -eq 1 ]
+then
+    read -p "Введите количество пиров: " peers
+    sed -i "s/- PEERS=1/- PEERS=$peers/g" docker-compose.yml
+    echo "Количество пиров изменено на $peers"
+elif [ $choice -eq 2 ]
+then
+    read -p "Введите имена пиров через запятую: " peers
+    # Проверяем, используются ли имена
+    if [[ "$peers" == *[!a-zA-Z0-9,]* ]]
+    then
+        echo "Ошибка: имена пиров могут содержать только латинские буквы и цифры"
+        exit 1
+    fi
+    # Проверяем, существует ли уже переменная среды PEERS
+    if grep -q "PEERS=" docker-compose.yml
+    then
+        # Если переменная уже существует
+        # Спрашиваем пользователя, заменить ли текущие имена на новые
+        echo "Переменная PEERS уже существует"
+        echo "1. Заменить текущие имена на новые"
+        echo "2. Добавить новые имена к текущим"
+        read -p "Введите номер способа: " add_choice
+        if [ $add_choice -eq 1 ]
+        then
+            sed -i "s/- PEERS=.*/- PEERS=\"$peers\"/g" docker-compose.yml
+        elif [ $add_choice -eq 2 ]
+        then
+            current_peers=$(grep PEERS docker-compose.yml | cut -d '=' -f 2 | tr -d '"')
+            new_peers=$(echo "$current_peers,$peers")
+            sed -i "s/- PEERS=.*/- PEERS=\"$new_peers\"/g" docker-compose.yml
+        else
+            echo "Ошибка: неверный выбор"
+            exit 1
+        fi
+    else
+        # Если переменная не существует, добавляем ее с новыми именами
+        sed -i "s/- PEERS=1/- PEERS=\"$peers\"/g" docker-compose.yml
+    fi
+    echo "Имена пиров изменены на $peers"
 else
-  echo "Пароль должен состоять только из английских букв и цифр, без пробелов и специальных символов."
+    echo "Ошибка: неверный выбор"
+    exit 1
 fi
-
-
-# Даем пользователю информацию по установке
-# Читаем текущие значения из файла docker-compose.yml
-CURRENT_PASSWORD=$(grep PASSWORD docker-compose.yml | cut -d= -f2)
-CURRENT_WG_HOST=$(grep WG_HOST docker-compose.yml | cut -d= -f2)
-CURRENT_WG_DEFAULT_ADDRESS=$(grep WG_DEFAULT_ADDRESS docker-compose.yml | cut -d= -f2)
-CURRENT_WG_DEFAULT_DNS=$(grep WG_DEFAULT_DNS docker-compose.yml | cut -d= -f2)
-
-
-# Выводим текущие значения
-echo ""
-echo -e "${BLUE}Текущие значения:${NC}"
-echo ""
-echo -e "Пароль от веб-интерфейса: ${BLUE}$CURRENT_PASSWORD${NC}"
-echo -e "IP адрес сервера: ${BLUE}$CURRENT_WG_HOST${NC}"
-echo -e "Маска пользовательских IP: ${BLUE}$CURRENT_WG_DEFAULT_ADDRESS${NC}"
-echo -e "Адрес входа в веб-интерфейс WireGuard после установки: ${YELLOW}http://$CURRENT_WG_HOST:51821${NC}"
-echo ""
-
 
 
 # Устанавливаем apache2-utils, если она не установлена
@@ -229,6 +208,7 @@ fi
 
 # Если логин не введен, устанавливаем логин по умолчанию "admin"
 while true; do
+  printf "${YELLOW} Теперь необходимо задать параметры для AdGuard HOME \n${NC}"
   echo -e "${YELLOW}Введите логин (только латинские буквы и цифры), если пропустить шаг будет задан логин admin:${NC}"  
   read username
   if [ -z "$username" ]; then
@@ -291,10 +271,7 @@ echo -e "${GREEN}Пароль: $password${NC}"
 # Запускаем docker-compose
 docker-compose up -d
 
-echo ""
-echo -e "Адрес входа в веб-интерфейс WireGuard после установки: ${BLUE}http://$CURRENT_WG_HOST:51821${NC}"
-echo -e "Адрес входа после настройки UFW-Docker, для подключения к Wireguard: ${BLUE}http://wg.local:51821${NC}"
-echo -e "Пароль от веб-интерфейса: ${BLUE}$CURRENT_PASSWORD${NC}"
+
 echo ""
 echo -e "Адрес входа в веб-интерфейс AdGuardHome после установки (только когда подключитесь к сети WireGuard!!!): ${BLUE}http://agh.local${NC}"
 echo "Ниже представлены логин и пароль для входа в AdGuardHome"
