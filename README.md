@@ -88,6 +88,7 @@ https://easylist-downloads.adblockplus.org/easylist.txt
 https://schakal.ru/hosts/alive_hosts_ru_com.txt
 * файл с разблокированными r.mail.ru и graph.facebook.com
 https://schakal.ru/hosts/hosts_mail_fb.txt
+---
 * All DNS Servers
 https://adguard-dns.io/kb/general/dns-providers/#cloudflare-dns
 * DNS Perfomance list:
