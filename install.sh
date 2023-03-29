@@ -115,7 +115,7 @@ else
     # Проверка, запущен ли контейнер, использующий порт 51821
     if lsof -Pi :51820 -sTCP:LISTEN -t >/dev/null ; then
         printf "${RED}!!!!>>> Порт 51820 уже используется контейнером.!\n ${NC}"
-        if docker ps --format '{{.Names}} {{.Ports}}' | grep -q "цшкупгфкв.*:51820->" ; then
+        if docker ps --format '{{.Names}} {{.Ports}}' | grep -q "wireguard.*:51820->" ; then
             printf "WireGuard контейнер использует порт 51820. Хотите продолжить установку? (y/n): "
             read -r choice
             case "$choice" in 
