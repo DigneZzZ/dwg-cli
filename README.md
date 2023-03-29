@@ -60,6 +60,9 @@ chmod +x peer.sh && ./peer.sh
 * Site: [OpeNode.RU](https://openode.ru)
 
 ## Скриншоты
+### peer.sh
+![image](https://user-images.githubusercontent.com/50312583/228484202-5de1ebbd-e816-4248-b03a-cd43ead8a22d.png)
+
 
 ### Adguard Web-UI
 ![image](https://user-images.githubusercontent.com/50312583/206703207-f3bd39f1-72c7-458c-9893-ad2126a0d47b.png)
