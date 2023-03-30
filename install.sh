@@ -54,7 +54,7 @@ then
 else
     # Установка docker-compose
     curl -L --fail https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh -o /usr/local/bin/docker-compose &&
-    chmod +x /usr/local/bin/docker-compose
+    chmod +x /usr/local/bin/docker-compose  
 
     # Проверка успешности установки
     if [ $? -eq 0 ]; then
@@ -80,14 +80,15 @@ else
 fi
 
 # Проверка актуальности версии docker-compose
-LATEST_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep "tag_name" | cut -d\" -f4)
-INSTALLED_VERSION=$(docker-compose version --short 2>/dev/null)
+#LATEST_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep "tag_name" | cut -d\" -f4)
+#INSTALLED_VERSION=$(docker-compose version --short 2>/dev/null)
 
-if [ "$LATEST_VERSION" = "$INSTALLED_VERSION" ]; then
-    printf "${GREEN}Установленная версия Docker Compose (%s) является актуальной\n" "$INSTALLED_VERSION${NC}"
-else
-    printf "${YELLOW}Установленная версия Docker Compose (%s) не является актуальной. Последняя версия: %s\n" "$INSTALLED_VERSION" "$LATEST_VERSION${NC}"
-fi
+#if [ "$LATEST_VERSION" = "$INSTALLED_VERSION" ]; then
+#    printf "${GREEN}Установленная версия Docker Compose (%s) является актуальной\n" "$INSTALLED_VERSION${NC}"
+##else
+#    printf "${YELLOW}Установленная версия Docker Compose (%s) не является актуальной. Последняя версия: %s\n" "$INSTALLED_VERSION" "$LATEST_VERSION${NC}"
+#    
+#fi
 
 
 # Устанавливаем редактор Nano
