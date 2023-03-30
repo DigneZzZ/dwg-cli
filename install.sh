@@ -177,12 +177,12 @@ then
         read -p "Введите номер способа: " add_choice
         if [ $add_choice -eq 1 ]
         then
-            sed -i "s/- PEERS=.*/- PEERS=\"$peers\"/g" docker-compose.yml
+            sed -i "s/- PEERS=.*/- PEERS=$peers/g" docker-compose.yml
         elif [ $add_choice -eq 2 ]
         then
             current_peers=$(grep PEERS docker-compose.yml | cut -d '=' -f 2 | tr -d '"')
             new_peers=$(echo "$current_peers,$peers")
-            sed -i "s/- PEERS=.*/- PEERS=\"$new_peers\"/g" docker-compose.yml
+            sed -i "s/- PEERS=.*/- PEERS=$new_peers/g" docker-compose.yml
         else
             echo "Ошибка: неверный выбор"
             exit 1
