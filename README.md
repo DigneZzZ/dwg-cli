@@ -38,7 +38,7 @@ apt update && apt install curl sudo git -y && curl -Of https://raw.githubusercon
 Чтобы получить параметры по созданным конфигам:
 
 ```bash
-./dwg-cli/peer.sh
+cd dwg-cli && ./peer.sh
 ```
 
 ## Что установится:
