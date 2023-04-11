@@ -1,5 +1,5 @@
 # dwg-cli
-
+<img src="https://user-images.githubusercontent.com/50312583/231138618-750b4b04-ade0-4e67-852e-f103030684a9.png" width="400">
 ## DWG Project - Docker WireGuard - CLI (DWG-CLI) - Проект одного скрипта 
 ### Представляю вам лучшую сборку для самой быстрой настройки VPN сервера на WireGuard
 ### DWG-CLI = AdGuard with DoH DNS +  Wireguard (CLI) + Unbound 
