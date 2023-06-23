@@ -146,7 +146,7 @@ printf "${GREEN} Этап проверки докера закончен, мож
 
 ##### ЗДЕСЬ БУДЕТ КОД ДЛЯ КОРРЕКТИРОВКИ COMPOSE
 # Получаем внешний IP-адрес
-MYHOST_IP=$(hostname -I | cut -d' ' -f1)
+MYHOST_IP=$(curl -s https://checkip.amazonaws.com/) 
 
 # Записываем IP-адрес в файл docker-compose.yml с меткой MYHOSTIP
 sed -i -E  "s/- SERVERURL=.*/- SERVERURL=$MYHOST_IP/g" docker-compose.yml
